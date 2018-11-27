@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ProfileMetadataMerger {
-	
+
 	/*
 	 * This method contains Merging/Adding elements to destination xml.
 	 * 
@@ -37,129 +37,130 @@ public class ProfileMetadataMerger {
 	public static String updateXmlElements(String sourceFile, String destFile) {
 
 		try { 
+			if(false) {//!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null
+
+				//Map for meta-data type with meta-data elements
+				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
+				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
+
+				//input xml parsing
+				File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
+				sourceMetadataMap = readMetaDataType(inputFile);
+				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
+
+				//destination xml parsing
+				File destinationFile = new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
+				destinationMetadataMap = readMetaDataType(destinationFile);
+				System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
+
+				/*
+				 * here in the below code we are iterating through the source and destination maps to compare the meta-data types
+				 * and meta-data elements. and later on we create a list of meda-data wrap to update at destination.
+				 * the list wrapper contains meta-data elements which are newly added, removed and updated.
+				 * later on sending that wrap to update destination xml method::
+				 */
+				//temp maps to hold meta-data type records which are created newly in source.
+				//and later used to compare source and destination to find new and add in destination.
+				Map<String, ProfileElements> mapForNewMetadataSource = new HashMap<String, ProfileElements>();
+				Map<String, ProfileElements> mapForNewMetadataDest =  new HashMap<String, ProfileElements>();
+
+				//contains list of meta-data types and elements to update in destination xml
+				ArrayList<MetadataRecWrapToUpdate> destinationMetadataWrapTOUpdate = new ArrayList<MetadataRecWrapToUpdate>();
 
 
-			//Map for meta-data type with meta-data elements
-			Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
-			Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
+				//null check for source and destination maps
+				if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
+					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
+					System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
 
-			//input xml parsing
-			File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
-			sourceMetadataMap = readMetaDataType(inputFile);
-			System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
+					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
 
-			//destination xml parsing
-			File destinationFile = new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
-			destinationMetadataMap = readMetaDataType(destinationFile);
-			System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
+						MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
 
-			/*
-			 * here in the below code we are iterating through the source and destination maps to compare the meta-data types
-			 * and meta-data elements. and later on we create a list of meda-data wrap to update at destination.
-			 * the list wrapper contains meta-data elements which are newly added, removed and updated.
-			 * later on sending that wrap to update destination xml method::
-			 */
-			//temp maps to hold meta-data type records which are created newly in source.
-			//and later used to compare source and destination to find new and add in destination.
-			Map<String, ProfileElements> mapForNewMetadataSource = new HashMap<String, ProfileElements>();
-			Map<String, ProfileElements> mapForNewMetadataDest =  new HashMap<String, ProfileElements>();
+						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
+						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
+						Set<ProfileElements> metadataRecSet = new HashSet<ProfileElements>();
+						Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
 
-			//contains list of meta-data types and elements to update in destination xml
-			ArrayList<MetadataRecWrapToUpdate> destinationMetadataWrapTOUpdate = new ArrayList<MetadataRecWrapToUpdate>();
+						for(ProfileElements tempstr1 :tempSorMetaDataElements) {//tempstr1 ==TestClass3Name ,enableTrue,TestClass3Name-enableTrue
 
+							mapForNewMetadataSource.put(tempstr1.getPreparedKey() ,tempstr1);
 
-			//null check for source and destination maps
-			if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
-				Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
-				System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
+							if(tempDestMetaDataElements != null) {
 
-				for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
+								for(ProfileElements tempstrDest1 :tempDestMetaDataElements) {
 
-					MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
+									mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
 
-					Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-					Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-					Set<ProfileElements> metadataRecSet = new HashSet<ProfileElements>();
-					Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
+									if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
 
-					for(ProfileElements tempstr1 :tempSorMetaDataElements) {//tempstr1 ==TestClass3Name ,enableTrue,TestClass3Name-enableTrue
+										if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
 
-						mapForNewMetadataSource.put(tempstr1.getPreparedKey() ,tempstr1);
+											metadataRecSet.add(tempstr1);
+											metadataRecSetToRemove.add(tempstrDest1);
 
-						if(tempDestMetaDataElements != null) {
+										}//equals prepare key for update check
 
-							for(ProfileElements tempstrDest1 :tempDestMetaDataElements) {
+									}//equals 
 
-								mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
+								}//tempDestMetaDataElements
 
-								if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
+							}//tempDestMetaDataElements null check
 
-									if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
+						}//tempSorMetaDataElements
 
-										metadataRecSet.add(tempstr1);
-										metadataRecSetToRemove.add(tempstrDest1);
-
-									}//equals prepare key for update check
-
-								}//equals 
-
-							}//tempDestMetaDataElements
-
-						}//tempDestMetaDataElements null check
-
-					}//tempSorMetaDataElements
-
-					// these debugs will provide us info related to meta-data elements related to a type 
-					// where these maps are used to compare newly added elements in source
-					System.out.println("mapForNewMetadataSource  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataSource.size() + "  " + mapForNewMetadataSource);
-					System.out.println("mapForNewMetadataDest  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataDest.size() + "  " + mapForNewMetadataDest);
+						// these debugs will provide us info related to meta-data elements related to a type 
+						// where these maps are used to compare newly added elements in source
+						System.out.println("mapForNewMetadataSource  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataSource.size() + "  " + mapForNewMetadataSource);
+						System.out.println("mapForNewMetadataDest  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataDest.size() + "  " + mapForNewMetadataDest);
 
 
-					//for loop for source to add newly added tags.
-					for(String tempStrTOAddNewSrc: mapForNewMetadataSource.keySet()) {
+						//for loop for source to add newly added tags.
+						for(String tempStrTOAddNewSrc: mapForNewMetadataSource.keySet()) {
 
-						if(!mapForNewMetadataDest.containsKey(tempStrTOAddNewSrc)) {
+							if(!mapForNewMetadataDest.containsKey(tempStrTOAddNewSrc)) {
 
-							metadataRecSet.add(mapForNewMetadataSource.get(tempStrTOAddNewSrc));
+								metadataRecSet.add(mapForNewMetadataSource.get(tempStrTOAddNewSrc));
 
-						}//contains key
+							}//contains key
 
-					}//for mapForNewMetadataSource
+						}//for mapForNewMetadataSource
 
-					//for loop for destination to remove tags which are not present in source.
-					for(String tempToRemoveFrDest: mapForNewMetadataDest.keySet()) {
+						//for loop for destination to remove tags which are not present in source.
+						for(String tempToRemoveFrDest: mapForNewMetadataDest.keySet()) {
 
-						if(!mapForNewMetadataSource.containsKey(tempToRemoveFrDest)) {
+							if(!mapForNewMetadataSource.containsKey(tempToRemoveFrDest)) {
 
-							metadataRecSetToRemove.add(mapForNewMetadataDest.get(tempToRemoveFrDest));
+								metadataRecSetToRemove.add(mapForNewMetadataDest.get(tempToRemoveFrDest));
 
-						}//contains key
+							}//contains key
 
-					}//for mapForNewMetadataDest
+						}//for mapForNewMetadataDest
 
-					//clearing map, later to add now elements related to new other meta-data types in the loop.
-					mapForNewMetadataSource.clear();
-					mapForNewMetadataDest.clear();
+						//clearing map, later to add now elements related to new other meta-data types in the loop.
+						mapForNewMetadataSource.clear();
+						mapForNewMetadataDest.clear();
 
-					//adding elements to the update wrapper.
-					tempMetadataRecWrapToUpdate.setNameType(tempMetaDataTypeSource);
-					tempMetadataRecWrapToUpdate.setMetadataRecSet(metadataRecSet);
-					tempMetadataRecWrapToUpdate.setMetadataRecSetToRemove(metadataRecSetToRemove);
-					destinationMetadataWrapTOUpdate.add(tempMetadataRecWrapToUpdate);//this is for updating in enable tag under a class
+						//adding elements to the update wrapper.
+						tempMetadataRecWrapToUpdate.setNameType(tempMetaDataTypeSource);
+						tempMetadataRecWrapToUpdate.setMetadataRecSet(metadataRecSet);
+						tempMetadataRecWrapToUpdate.setMetadataRecSetToRemove(metadataRecSetToRemove);
+						destinationMetadataWrapTOUpdate.add(tempMetadataRecWrapToUpdate);//this is for updating in enable tag under a class
 
-				}//for tempSourceMetadataMap close
+					}//for tempSourceMetadataMap close
 
-				System.out.println("destinationMetadataWrapTOUpdate  + " + destinationMetadataWrapTOUpdate);
+					System.out.println("destinationMetadataWrapTOUpdate  + " + destinationMetadataWrapTOUpdate);
 
-			}//if null check close for source and destination
+				}//if null check close for source and destination
 
-			//calling update destination method.
-			updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
-
+				//calling update destination method.
+				updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Return");
 		return "return update";
 
 	}
@@ -172,85 +173,85 @@ public class ProfileMetadataMerger {
 
 		try { 
 
+			if(false) {//!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null
+				//Map for meta-data type with meta-data elements
+				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
+				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 
-			//Map for meta-data type with meta-data elements
-			Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
-			Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
+				//input xml parsing
+				File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
+				sourceMetadataMap = readMetaDataType(inputFile);
+				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
 
-			//input xml parsing
-			File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
-			sourceMetadataMap = readMetaDataType(inputFile);
-			System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
+				//destination xml parsing
+				File destinationFile = new File(destFile);//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
+				destinationMetadataMap = readMetaDataType(destinationFile);
+				System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
 
-			//destination xml parsing
-			File destinationFile = new File(destFile);//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
-			destinationMetadataMap = readMetaDataType(destinationFile);
-			System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
+				/*
+				 * here in the below code we are iterating through the source and destination maps to compare the meta-data types
+				 * and meta-data elements. and later on we create a list of meda-data wrap to update at destination.
+				 * the list wrapper contains meta-data elements which are newly added, removed and updated.
+				 * later on sending that wrap to update destination xml method::
+				 */
+				//temp maps to hold meta-data type records which are created newly in source.
+				//and later used to compare source and destination to find new and add in destination.
+				Map<String, ProfileElements> mapForNewMetadataSource = new HashMap<String, ProfileElements>();
+				Map<String, ProfileElements> mapForNewMetadataDest =  new HashMap<String, ProfileElements>();
 
-			/*
-			 * here in the below code we are iterating through the source and destination maps to compare the meta-data types
-			 * and meta-data elements. and later on we create a list of meda-data wrap to update at destination.
-			 * the list wrapper contains meta-data elements which are newly added, removed and updated.
-			 * later on sending that wrap to update destination xml method::
-			 */
-			//temp maps to hold meta-data type records which are created newly in source.
-			//and later used to compare source and destination to find new and add in destination.
-			Map<String, ProfileElements> mapForNewMetadataSource = new HashMap<String, ProfileElements>();
-			Map<String, ProfileElements> mapForNewMetadataDest =  new HashMap<String, ProfileElements>();
-
-			//contains list of meta-data types and elements to update in destination xml
-			ArrayList<MetadataRecWrapToUpdate> destinationMetadataWrapTOUpdate = new ArrayList<MetadataRecWrapToUpdate>();
-
-
-			//null check for source and destination maps
-			if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
-				Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
-				System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
-
-				for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
-
-					MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
-
-					Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-					Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-					//Set<ProfileElements> metadataRecSet = new HashSet<>();
-					Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
-
-					for(ProfileElements tempstr1 :tempSorMetaDataElements) {//tempstr1 ==TestClass3Name ,enableTrue,TestClass3Name-enableTrue
-
-						mapForNewMetadataSource.put(tempstr1.getPreparedKey() ,tempstr1);
-
-						if(tempDestMetaDataElements != null) {
-
-							for(ProfileElements tempstrDest1 :tempDestMetaDataElements) {
-
-								mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
-
-								if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
-
-									if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
-
-										//metadataRecSet.add(tempstr1);
-										metadataRecSetToRemove.add(tempstrDest1);
-
-									}//equals prepare key for update check
-
-								}//equals 
-
-							}//tempDestMetaDataElements
-
-						}//tempDestMetaDataElements null check
-
-					}//tempSorMetaDataElements
-
-					// these debugs will provide us info related to meta-data elements related to a type 
-					// where these maps are used to compare newly added elements in source
-					System.out.println("mapForNewMetadataSource  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataSource.size() + "  " + mapForNewMetadataSource);
-					System.out.println("mapForNewMetadataDest  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataDest.size() + "  " + mapForNewMetadataDest);
+				//contains list of meta-data types and elements to update in destination xml
+				ArrayList<MetadataRecWrapToUpdate> destinationMetadataWrapTOUpdate = new ArrayList<MetadataRecWrapToUpdate>();
 
 
-					//for loop for source to add newly added tags.
-					/*for(String tempStrTOAddNewSrc: mapForNewMetadataSource.keySet()) {
+				//null check for source and destination maps
+				if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
+					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
+					System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
+
+					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
+
+						MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
+
+						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
+						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
+						//Set<ProfileElements> metadataRecSet = new HashSet<>();
+						Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
+
+						for(ProfileElements tempstr1 :tempSorMetaDataElements) {//tempstr1 ==TestClass3Name ,enableTrue,TestClass3Name-enableTrue
+
+							mapForNewMetadataSource.put(tempstr1.getPreparedKey() ,tempstr1);
+
+							if(tempDestMetaDataElements != null) {
+
+								for(ProfileElements tempstrDest1 :tempDestMetaDataElements) {
+
+									mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
+
+									if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
+
+										if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
+
+											//metadataRecSet.add(tempstr1);
+											metadataRecSetToRemove.add(tempstrDest1);
+
+										}//equals prepare key for update check
+
+									}//equals 
+
+								}//tempDestMetaDataElements
+
+							}//tempDestMetaDataElements null check
+
+						}//tempSorMetaDataElements
+
+						// these debugs will provide us info related to meta-data elements related to a type 
+						// where these maps are used to compare newly added elements in source
+						System.out.println("mapForNewMetadataSource  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataSource.size() + "  " + mapForNewMetadataSource);
+						System.out.println("mapForNewMetadataDest  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataDest.size() + "  " + mapForNewMetadataDest);
+
+
+						//for loop for source to add newly added tags.
+						/*for(String tempStrTOAddNewSrc: mapForNewMetadataSource.keySet()) {
 
 						if(!mapForNewMetadataDest.containsKey(tempStrTOAddNewSrc)) {
 
@@ -259,41 +260,42 @@ public class ProfileMetadataMerger {
 						}//contains key
 
 					}//for mapForNewMetadataSource
-					**/
-					//for loop for destination to remove tags which are not present in source.
-					for(String tempToRemoveFrDest: mapForNewMetadataDest.keySet()) {
+						 **/
+						//for loop for destination to remove tags which are not present in source.
+						for(String tempToRemoveFrDest: mapForNewMetadataDest.keySet()) {
 
-						if(!mapForNewMetadataSource.containsKey(tempToRemoveFrDest)) {
+							if(!mapForNewMetadataSource.containsKey(tempToRemoveFrDest)) {
 
-							metadataRecSetToRemove.add(mapForNewMetadataDest.get(tempToRemoveFrDest));
+								metadataRecSetToRemove.add(mapForNewMetadataDest.get(tempToRemoveFrDest));
 
-						}//contains key
+							}//contains key
 
-					}//for mapForNewMetadataDest
+						}//for mapForNewMetadataDest
 
-					//clearing map, later to add now elements related to new other meta-data types in the loop.
-					mapForNewMetadataSource.clear();
-					mapForNewMetadataDest.clear();
+						//clearing map, later to add now elements related to new other meta-data types in the loop.
+						mapForNewMetadataSource.clear();
+						mapForNewMetadataDest.clear();
 
-					//adding elements to the update wrapper.
-					tempMetadataRecWrapToUpdate.setNameType(tempMetaDataTypeSource);
-					//tempMetadataRecWrapToUpdate.setMetadataRecSet(metadataRecSet);
-					tempMetadataRecWrapToUpdate.setMetadataRecSetToRemove(metadataRecSetToRemove);
-					destinationMetadataWrapTOUpdate.add(tempMetadataRecWrapToUpdate);//this is for updating in enable tag under a class
+						//adding elements to the update wrapper.
+						tempMetadataRecWrapToUpdate.setNameType(tempMetaDataTypeSource);
+						//tempMetadataRecWrapToUpdate.setMetadataRecSet(metadataRecSet);
+						tempMetadataRecWrapToUpdate.setMetadataRecSetToRemove(metadataRecSetToRemove);
+						destinationMetadataWrapTOUpdate.add(tempMetadataRecWrapToUpdate);//this is for updating in enable tag under a class
 
-				}//for tempSourceMetadataMap close
+					}//for tempSourceMetadataMap close
 
-				System.out.println("destinationMetadataWrapTOUpdate  + " + destinationMetadataWrapTOUpdate);
+					System.out.println("destinationMetadataWrapTOUpdate  + " + destinationMetadataWrapTOUpdate);
 
-			}//if null check close for source and destination
+				}//if null check close for source and destination
 
-			//calling update destination method.
-			updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
-
+				//calling update destination method.
+				updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Return");
 		return "return delete";
 
 	}
