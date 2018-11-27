@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,15 +35,16 @@ public class ProfileMetadataMerger {
 	 * 
 	 * */
 	@RequestMapping("/update")
-	public static String updateXmlElements(String sourceFile, String destFile) {
+	public static String updateXmlElements(@RequestParam(value="sourceFile", defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")String sourceFile, 
+			@RequestParam(value="destFile", defaultValue="/Users/rkonduru/Desktop/destinationPackageProfile.xml")String destFile) {
 
-		try { 
-			if(false) {//!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null
-
+		try { ///Users/rkonduru/Documents/workspace-sts-3.9.6.RELEASE/MergingTool/
+			System.out.println("sourceFile " + sourceFile);
+			if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
 				//Map for meta-data type with meta-data elements
 				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
-
+				
 				//input xml parsing
 				File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
 				sourceMetadataMap = readMetaDataType(inputFile);
@@ -169,11 +171,12 @@ public class ProfileMetadataMerger {
 	 * 
 	 * */
 	@RequestMapping("/delete")
-	public static String deleteXmlElements(String sourceFile, String destFile) {
+	public static String deleteXmlElements(@RequestParam(value="sourceFile", defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")String sourceFile, 
+			@RequestParam(value="destFile", defaultValue="/Users/rkonduru/Desktop/destinationPackageProfile.xml")String destFile) {
 
 		try { 
-
-			if(false) {//!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null
+			System.out.println("sourceFile " + sourceFile);
+			if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
 				//Map for meta-data type with meta-data elements
 				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
