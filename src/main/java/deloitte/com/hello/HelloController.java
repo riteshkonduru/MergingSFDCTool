@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 	@RequestMapping("/hello")
 	public String sayHi() {
-		return "Hello , this is your Spring Boot project.";
+		return "Hello , this is MergingSFCTool Spring Boot application on Heroku.";
 	} 
 
 }
