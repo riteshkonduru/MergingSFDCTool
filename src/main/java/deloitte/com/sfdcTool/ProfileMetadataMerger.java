@@ -1,8 +1,16 @@
 package deloitte.com.sfdcTool;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,9 +43,9 @@ public class ProfileMetadataMerger {
 	 * 
 	 * */
 	@RequestMapping("/update")
-	public static String updateXmlElements(@RequestParam(value="sourceFile", defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")String sourceFile, 
-			@RequestParam(value="destFile", defaultValue="/Users/rkonduru/Desktop/destinationPackageProfile.xml")String destFile) {
-
+	public static String updateXmlElements(@RequestParam(value="sourceFile")String sourceFile, 
+			@RequestParam(value="destFile")String destFile) {
+		String readReturn = "";
 		try { ///Users/rkonduru/Documents/workspace-sts-3.9.6.RELEASE/MergingTool/
 			System.out.println("sourceFile " + sourceFile);
 			if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
@@ -45,13 +53,27 @@ public class ProfileMetadataMerger {
 				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				
+				File newFile = new File("src/test/resources/newFile_jdk6.txt");
+			    boolean success = newFile.createNewFile();
+			    BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+			    writer.write(sourceFile);
+			     
+			    writer.close();
+			    System.out.println("Success " + success);
 				//input xml parsing
-				File inputFile = new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
+				File inputFile = newFile;//new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
 				sourceMetadataMap = readMetaDataType(inputFile);
 				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
-
+				
+				File newFileDest = new File("src/test/resources/newFile_Dest.txt");
+			    boolean successDest = newFile.createNewFile();
+			    BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
+			    writer1.write(destFile);
+			     
+			    writer1.close();
+			    System.out.println("Success " + successDest);
 				//destination xml parsing
-				File destinationFile = new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
+				File destinationFile = newFileDest;//new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
 				destinationMetadataMap = readMetaDataType(destinationFile);
 				System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
 
@@ -157,14 +179,36 @@ public class ProfileMetadataMerger {
 
 				//calling update destination method.
 				updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
+				//Path path = Paths.get("src/test/resources/newFile_Dest.txt");
+				//readReturn = Files.readAllLines(path).get(0);
+				readReturn = readFile("src/test/resources/newFile_Dest.txt");
+				File fileToDelete = new File("src/test/resources/newFile_Dest.txt");
+				File fileToDeleteDest = new File("src/test/resources/newFile_jdk6.txt");
+			    
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("Return");
-		return "return update";
+		return readReturn;//"return update";
 
+	}
+	public static String readFile(String fileName) throws IOException {
+	    BufferedReader br = new BufferedReader(new FileReader(fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
 	}
 	/*
 	 * This method contains Deleting elements to destination xml.
@@ -435,8 +479,8 @@ public class ProfileMetadataMerger {
 			DOMSource source = new DOMSource(docDestinationFile);
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			StreamResult result = new StreamResult(new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml"));
-
+			StreamResult result = new StreamResult(new File("src/test/resources/newFile_Dest.txt"));
+			System.out.println("result " +  result);
 			transformer.transform(source, result);
 			System.out.println("File saved!");
 

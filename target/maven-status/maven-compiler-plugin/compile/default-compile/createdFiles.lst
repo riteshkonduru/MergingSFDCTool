@@ -1,9 +1,9 @@
+deloitte/com/sfdcTool/Profile.class
+deloitte/com/sfdcTool/UserPermissions.class
+deloitte/com/sfdcTool/ProfileElements.class
+deloitte/com/sfdcTool/MetadataRecWrapToUpdate.class
 deloitte/com/Application.class
 deloitte/com/sfdcTool/ClassAccesses.class
 deloitte/com/sfdcTool/ProfileMetadataMerger.class
 deloitte/com/sfdcTool/PageAccesses.class
 deloitte/com/hello/HelloController.class
-deloitte/com/sfdcTool/Profile.class
-deloitte/com/sfdcTool/UserPermissions.class
-deloitte/com/sfdcTool/ProfileElements.class
-deloitte/com/sfdcTool/MetadataRecWrapToUpdate.class
