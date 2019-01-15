@@ -47,9 +47,9 @@ public class ProfileMetadataMerger {
 			System.out.println("sourceFile " + sourceFile);
 			if(!(sourceFile.length >0) && sourceFile != null &&  !(destFile.length >0) && destFile != null) {
 				
-				byte[] decodedBytes = Base64.getDecoder().decode(sourceFile);
+				//byte[] decodedBytes = Base64.getDecoder().decode(sourceFile);
 				File newFile = new File("src/test/resources/newFile_jdk6.txt");
-				FileUtils.writeByteArrayToFile(newFile, decodedBytes);
+				FileUtils.writeByteArrayToFile(newFile, sourceFile);
 				
 		
 				//Map for meta-data type with meta-data elements
@@ -75,9 +75,9 @@ public class ProfileMetadataMerger {
 			     
 			   // writer1.close();
 			    //System.out.println("Success " + successDest);
-				byte[] decodedBytesDest = Base64.getDecoder().decode(destFile);
+				//byte[] decodedBytesDest = Base64.getDecoder().decode(destFile);
 				File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-				FileUtils.writeByteArrayToFile(newFileDest, decodedBytesDest);
+				FileUtils.writeByteArrayToFile(newFileDest, destFile);
 				//destination xml parsing
 				File destinationFile = newFileDest;//new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
 				destinationMetadataMap = readMetaDataType(destinationFile);
