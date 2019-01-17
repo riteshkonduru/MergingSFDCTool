@@ -222,10 +222,10 @@ public class ProfileMetadataMerger {
 				readReturn = readFile("src/test/resources/newFile_Dest.txt");
 				File fileToDelete = new File("src/test/resources/newFile_Dest.txt");
 				File fileToDeleteDest = new File("src/test/resources/newFile_jdk6.txt");
-				boolean successDelSource = fileToDelete.delete();
-				boolean successDelDest = fileToDeleteDest.delete();
+				//boolean successDelSource = fileToDelete.delete();
+				//boolean successDelDest = fileToDeleteDest.delete();
 				
-				System.out.println("Return" + successDelSource + successDelDest );
+				//System.out.println("Return" + successDelSource + successDelDest );
 			}
 
 		} catch (Exception e) {
