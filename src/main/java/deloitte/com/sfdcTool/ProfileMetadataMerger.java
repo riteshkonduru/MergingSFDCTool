@@ -27,6 +27,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.apache.commons.io.FileUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,21 +41,47 @@ public class ProfileMetadataMerger {
 	 * This method contains Merging/Adding elements to destination xml.
 	 * 
 	 * */
-	@RequestMapping("/update")
-	public static String updateXmlElements(@RequestParam(value="sourceFile")String sourceFile, 
-			@RequestParam(value="destFile")String destFile) {
+	@PostMapping("/update")
+	public static String updateXmlElements(@RequestBody String compareContent) {
 		String readReturn = "";
 		
 		try { ///Users/rkonduru/Documents/workspace-sts-3.9.6.RELEASE/MergingTool/
-			System.out.println("sourceFile " + sourceFile);
+			System.out.println("compareContent " + compareContent);
+			File newFile = new File("src/test/resources/newFile_jdk6.txt");
+			File newFileDest = new File("src/test/resources/newFile_Dest.txt");
 			//if(!(sourceFile.length >0) && sourceFile != null &&  !(destFile.length >0) && destFile != null) {
-			if(!sourceFile.isEmpty()  && sourceFile != null &&  !destFile.isEmpty() && destFile != null) {
-						
+			//if(!sourceFile.isEmpty()  && sourceFile != null &&  !destFile.isEmpty() && destFile != null) {
+			if( !compareContent.isEmpty() && compareContent != null) {
+				compareContent = compareContent.replaceAll("\\s+"," ");
+				System.out.println("compareContent " + compareContent);
+				String[] compareContentStr=compareContent.split("\\*SEPARATOR\\*");
+				System.out.println("compareContent " + compareContentStr.length);
+				for(String w:compareContentStr){  
+					System.out.println(w);  
+					}  
+				if(compareContentStr.length >0) {
+					 
+					 if(compareContentStr[0] != null && !compareContentStr[0].isEmpty()) {
+						 boolean success = newFile.createNewFile();
+						 BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+						 writer.write(compareContentStr[0]);
+						 System.out.println("Success " + success);
+						 writer.close();
+					 }
+					 if(compareContentStr[1] != null && !compareContentStr[1].isEmpty()) {
+						 boolean successDest = newFileDest.createNewFile();
+						 BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
+						 System.out.println(compareContentStr[1].trim()); 
+						 writer1.write(compareContentStr[1].trim());   
+						 writer1.close();
+						 System.out.println("Success " + successDest);
+					 }
+				}
 				//byte[] decodedBytes = Base64.getDecoder().decode(sourceFile);
-				byte[] decodedBytes = DatatypeConverter.parseBase64Binary(sourceFile);
-				System.out.println("Success String  " + new String(decodedBytes));
-				File newFile = new File("src/test/resources/newFile_jdk6.txt");
-				FileUtils.writeByteArrayToFile(newFile, decodedBytes);
+				//byte[] decodedBytes = DatatypeConverter.parseBase64Binary(sourceFile);
+				//System.out.println("Success String  " + new String(decodedBytes));
+				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
+				//FileUtils.writeByteArrayToFile(newFile, decodedBytes);
 				
 		
 				//Map for meta-data type with meta-data elements
@@ -61,12 +89,10 @@ public class ProfileMetadataMerger {
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				
 				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
-			    boolean success = newFile.createNewFile();
-			   // BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
-			    //writer.write(sourceFile);
+			   
 			     
-			    //writer.close();
-			    System.out.println("Success " + success);
+			    
+			    //System.out.println("Success " + success);
 				//input xml parsing
 				File inputFile = newFile;//new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
 				sourceMetadataMap = readMetaDataType(inputFile);
@@ -80,10 +106,10 @@ public class ProfileMetadataMerger {
 			   // writer1.close();
 			    //System.out.println("Success " + successDest);
 				//byte[] decodedBytesDest = Base64.getDecoder().decode(destFile);
-				byte[] decodedBytesDest = DatatypeConverter.parseBase64Binary(destFile);
-				System.out.println("Success String  " + new String(decodedBytesDest));
-				File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-				FileUtils.writeByteArrayToFile(newFileDest, decodedBytesDest);
+				//byte[] decodedBytesDest = DatatypeConverter.parseBase64Binary(destFile);
+				//System.out.println("Success String  " + new String(decodedBytesDest));
+				//File newFileDest = new File("src/test/resources/newFile_Dest.txt");
+				//FileUtils.writeByteArrayToFile(newFileDest, decodedBytesDest);
 				//destination xml parsing
 				File destinationFile = newFileDest;//new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
 				destinationMetadataMap = readMetaDataType(destinationFile);
