@@ -3,4 +3,8 @@
     <apexClass>TestClass2</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <userPermissions>
+    <name>ActivateContract3</name>
+    <enabled>false</enabled>
+  </userPermissions>
 </Profile>
