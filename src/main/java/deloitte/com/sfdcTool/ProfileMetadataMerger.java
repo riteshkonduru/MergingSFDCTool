@@ -256,37 +256,64 @@ public class ProfileMetadataMerger {
 	 * 
 	 * */
 	@RequestMapping("/delete")
-	public static String deleteXmlElements(@RequestParam(value="sourceFile") String sourceFile, 
-			@RequestParam(value="destFile") String destFile) {//, defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")
+	public static String deleteXmlElements(@RequestBody String compareContent)  {//, defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")
 		    String readReturn = "";
 		try { 
-			System.out.println("sourceFile " + sourceFile);
-			if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
+			System.out.println("compareContent " + compareContent);
+			File newFile = new File("src/test/resources/newFile_jdk6.txt");
+			File newFileDest = new File("src/test/resources/newFile_Dest.txt");
+			//if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
+		    if(!compareContent.isEmpty() && compareContent != null) {
+		    	compareContent = compareContent.replaceAll("\\s+"," ");
+				System.out.println("compareContent " + compareContent);
+				String[] compareContentStr=compareContent.split("\\*SEPARATOR\\*");
+				System.out.println("compareContent " + compareContentStr.length);
+				for(String w:compareContentStr){  
+					System.out.println(w);  
+					}  
+				if(compareContentStr.length >0) {
+					 
+					 if(compareContentStr[0] != null && !compareContentStr[0].isEmpty()) {
+						 boolean success = newFile.createNewFile();
+						 BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+						 writer.write(compareContentStr[0]);
+						 System.out.println("Success " + success);
+						 writer.close();
+					 }
+					 if(compareContentStr[1] != null && !compareContentStr[1].isEmpty()) {
+						 boolean successDest = newFileDest.createNewFile();
+						 BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
+						 System.out.println(compareContentStr[1].trim()); 
+						 writer1.write(compareContentStr[1].trim());   
+						 writer1.close();
+						 System.out.println("Success " + successDest);
+					 }
+				}
 				//Map for meta-data type with meta-data elements
 				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				
 
-				File newFile = new File("src/test/resources/newFile_jdk6.txt");
-			    boolean success = newFile.createNewFile();
-			    BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
-			    writer.write(sourceFile);
+				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
+			    //boolean success = newFile.createNewFile();
+			    //BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+			    //writer.write(sourceFile);
 			     
-			    writer.close();
-			    System.out.println("Success " + success);
+			    //writer.close();
+			    //System.out.println("Success " + success);
 
 				//input xml parsing
 				File inputFile = newFile;//new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
 				sourceMetadataMap = readMetaDataType(inputFile);
 				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
 
-				File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-			    boolean successDest = newFile.createNewFile();
-			    BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
-			    writer1.write(destFile);
+				//File newFileDest = new File("src/test/resources/newFile_Dest.txt");
+			    //boolean successDest = newFile.createNewFile();
+			    //BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
+			    //writer1.write(destFile);
 			     
-			    writer1.close();
-			    System.out.println("Success " + successDest);
+			    //writer1.close();
+			    //System.out.println("Success " + successDest);
 				//destination xml parsing
 				File destinationFile = newFileDest;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
 				destinationMetadataMap = readMetaDataType(destinationFile);
