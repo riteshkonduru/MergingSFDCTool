@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,37 +19,32 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import org.apache.commons.io.FileUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-public class ProfileMetadataMerger {
+public class ProfileMetadataMergerOLD {
 
 	/*
 	 * This method contains Merging/Adding elements to destination xml.
 	 * 
 	 * */
-	@PostMapping("/update")
+	@PostMapping("/updateOLD")
 	public static String updateXmlElements(@RequestBody String compareContent) {
 		String readReturn = "";
 		
-		try { ///Users/rkonduru/Documents/workspace-sts-3.9.6.RELEASE/MergingTool/
+		try { 
 			System.out.println("compareContent " + compareContent);
 			File newFile = new File("src/test/resources/newFile_jdk6.txt");
 			File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-			//if(!(sourceFile.length >0) && sourceFile != null &&  !(destFile.length >0) && destFile != null) {
-			//if(!sourceFile.isEmpty()  && sourceFile != null &&  !destFile.isEmpty() && destFile != null) {
 			if( !compareContent.isEmpty() && compareContent != null) {
 				compareContent = compareContent.replaceAll("\\s+"," ");
 				System.out.println("compareContent " + compareContent);
@@ -77,41 +71,19 @@ public class ProfileMetadataMerger {
 						 System.out.println("Success " + successDest);
 					 }
 				}
-				//byte[] decodedBytes = Base64.getDecoder().decode(sourceFile);
-				//byte[] decodedBytes = DatatypeConverter.parseBase64Binary(sourceFile);
-				//System.out.println("Success String  " + new String(decodedBytes));
-				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
-				//FileUtils.writeByteArrayToFile(newFile, decodedBytes);
 				
 		
 				//Map for meta-data type with meta-data elements
 				Map<String, Set<ProfileElements>> sourceMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				
-				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
-			   
-			     
-			    
-			    //System.out.println("Success " + success);
 				//input xml parsing
-				File inputFile = newFile;//new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
+				File inputFile = newFile;
 				sourceMetadataMap = readMetaDataType(inputFile);
 				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
 				
-				//File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-			    //boolean successDest = newFile.createNewFile();
-			    //BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
-			    //writer1.write(destFile);
-			     
-			   // writer1.close();
-			    //System.out.println("Success " + successDest);
-				//byte[] decodedBytesDest = Base64.getDecoder().decode(destFile);
-				//byte[] decodedBytesDest = DatatypeConverter.parseBase64Binary(destFile);
-				//System.out.println("Success String  " + new String(decodedBytesDest));
-				//File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-				//FileUtils.writeByteArrayToFile(newFileDest, decodedBytesDest);
 				//destination xml parsing
-				File destinationFile = newFileDest;//new File(destFile);;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
+				File destinationFile = newFileDest;
 				destinationMetadataMap = readMetaDataType(destinationFile);
 				System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
 
@@ -131,16 +103,16 @@ public class ProfileMetadataMerger {
 
 
 				//null check for source and destination maps
-				if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
-					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
+				if(sourceMetadataMap != null && destinationMetadataMap != null ) {
+					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();
 					System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
 
-					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
+					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {
 
 						MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
 
-						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
+						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);
+						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);
 						Set<ProfileElements> metadataRecSet = new HashSet<ProfileElements>();
 						Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
 
@@ -154,7 +126,7 @@ public class ProfileMetadataMerger {
 
 									mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
 
-									if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
+									if(tempstr1.getName().equals(tempstrDest1.getName())) {
 
 										if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
 
@@ -217,22 +189,18 @@ public class ProfileMetadataMerger {
 
 				//calling update destination method.
 				updateDestinationXml(destinationMetadataWrapTOUpdate, destinationFile);
-				//Path path = Paths.get("src/test/resources/newFile_Dest.txt");
-				//readReturn = Files.readAllLines(path).get(0);
+
 				readReturn = readFile("src/test/resources/newFile_Dest.txt");
 				File fileToDelete = new File("src/test/resources/newFile_Dest.txt");
 				File fileToDeleteDest = new File("src/test/resources/newFile_jdk6.txt");
-				//boolean successDelSource = fileToDelete.delete();
-				//boolean successDelDest = fileToDeleteDest.delete();
-				
-				//System.out.println("Return" + successDelSource + successDelDest );
+
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("Return");
-		return readReturn;//"return update";
+		return readReturn;
 
 	}
 	public static String readFile(String fileName) throws IOException {
@@ -255,14 +223,13 @@ public class ProfileMetadataMerger {
 	 * This method contains Deleting elements to destination xml.
 	 * 
 	 * */
-	@RequestMapping("/delete")
-	public static String deleteXmlElements(@RequestBody String compareContent)  {//, defaultValue="/Users/rkonduru/Desktop/sourcePackageProfile.xml")
+	@RequestMapping("/deleteOLD")
+	public static String deleteXmlElements(@RequestBody String compareContent)  {
 		    String readReturn = "";
 		try { 
 			System.out.println("compareContent " + compareContent);
 			File newFile = new File("src/test/resources/newFile_jdk6.txt");
 			File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-			//if(!sourceFile.isEmpty() && sourceFile != null && !destFile.isEmpty() && destFile != null) {
 		    if(!compareContent.isEmpty() && compareContent != null) {
 		    	compareContent = compareContent.replaceAll("\\s+"," ");
 				System.out.println("compareContent " + compareContent);
@@ -294,28 +261,15 @@ public class ProfileMetadataMerger {
 				Map<String, Set<ProfileElements>> destinationMetadataMap = new HashMap<String, Set<ProfileElements>>();
 				
 
-				//File newFile = new File("src/test/resources/newFile_jdk6.txt");
-			    //boolean success = newFile.createNewFile();
-			    //BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
-			    //writer.write(sourceFile);
-			     
-			    //writer.close();
-			    //System.out.println("Success " + success);
 
 				//input xml parsing
-				File inputFile = newFile;//new File(sourceFile);//new File("/Users/rkonduru/Desktop/sourcePackageProfile.xml");//objMetaDataMerger.getFile("doc1.xml");
+				File inputFile = newFile;
 				sourceMetadataMap = readMetaDataType(inputFile);
 				System.out.println(" sourceMetadataMap: " + sourceMetadataMap);
 
-				//File newFileDest = new File("src/test/resources/newFile_Dest.txt");
-			    //boolean successDest = newFile.createNewFile();
-			    //BufferedWriter writer1 = new BufferedWriter(new FileWriter(newFileDest));
-			    //writer1.write(destFile);
-			     
-			    //writer1.close();
-			    //System.out.println("Success " + successDest);
+
 				//destination xml parsing
-				File destinationFile = newFileDest;//new File("/Users/rkonduru/Desktop/destinationPackageProfile.xml");//objMetaDataMerger.getFile("doc2.xml");
+				File destinationFile = newFileDest;
 				destinationMetadataMap = readMetaDataType(destinationFile);
 				System.out.println(" destinationMetadataMap: " + destinationMetadataMap);
 
@@ -335,20 +289,19 @@ public class ProfileMetadataMerger {
 
 
 				//null check for source and destination maps
-				if(sourceMetadataMap != null && destinationMetadataMap != null ) {//Map<classAccesses, Map<TestClass3Name, enableTrue>>
-					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();//tempSourceMetadataMap == classAccesses,pageAccesses,userPermissions
+				if(sourceMetadataMap != null && destinationMetadataMap != null ) {
+					Set<String> tempSourceMetadataMap = sourceMetadataMap.keySet();
 					System.out.println("tempSourceMetadataMap " + tempSourceMetadataMap.size() + "  " + tempSourceMetadataMap);
 
-					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {//tempStr == classAccesses
+					for(String tempMetaDataTypeSource: tempSourceMetadataMap) {
 
 						MetadataRecWrapToUpdate tempMetadataRecWrapToUpdate = new MetadataRecWrapToUpdate();
 
-						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);//Map<TestClass3Name, enableTrue>
-						//Set<ProfileElements> metadataRecSet = new HashSet<>();
+						Set<ProfileElements> tempDestMetaDataElements = destinationMetadataMap.get(tempMetaDataTypeSource);
+						Set<ProfileElements> tempSorMetaDataElements = sourceMetadataMap.get(tempMetaDataTypeSource);
 						Set<ProfileElements> metadataRecSetToRemove = new HashSet<ProfileElements>();
 
-						for(ProfileElements tempstr1 :tempSorMetaDataElements) {//tempstr1 ==TestClass3Name ,enableTrue,TestClass3Name-enableTrue
+						for(ProfileElements tempstr1 :tempSorMetaDataElements) {
 
 							mapForNewMetadataSource.put(tempstr1.getPreparedKey() ,tempstr1);
 
@@ -358,11 +311,10 @@ public class ProfileMetadataMerger {
 
 									mapForNewMetadataDest.put(tempstrDest1.getPreparedKey(), tempstrDest1);
 
-									if(tempstr1.getName().equals(tempstrDest1.getName())) {//recProfileElements.getPreparedKey
+									if(tempstr1.getName().equals(tempstrDest1.getName())) {
 
 										if(!tempstr1.getPreparedKey().equals(tempstrDest1.getPreparedKey())) {
 
-											//metadataRecSet.add(tempstr1);
 											metadataRecSetToRemove.add(tempstrDest1);
 
 										}//equals prepare key for update check
@@ -380,18 +332,6 @@ public class ProfileMetadataMerger {
 						System.out.println("mapForNewMetadataSource  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataSource.size() + "  " + mapForNewMetadataSource);
 						System.out.println("mapForNewMetadataDest  + " + " " + tempMetaDataTypeSource + " " + mapForNewMetadataDest.size() + "  " + mapForNewMetadataDest);
 
-
-						//for loop for source to add newly added tags.
-						/*for(String tempStrTOAddNewSrc: mapForNewMetadataSource.keySet()) {
-
-						if(!mapForNewMetadataDest.containsKey(tempStrTOAddNewSrc)) {
-
-							metadataRecSet.add(mapForNewMetadataSource.get(tempStrTOAddNewSrc));
-
-						}//contains key
-
-					}//for mapForNewMetadataSource
-						 **/
 						//for loop for destination to remove tags which are not present in source.
 						for(String tempToRemoveFrDest: mapForNewMetadataDest.keySet()) {
 
@@ -409,7 +349,6 @@ public class ProfileMetadataMerger {
 
 						//adding elements to the update wrapper.
 						tempMetadataRecWrapToUpdate.setNameType(tempMetaDataTypeSource);
-						//tempMetadataRecWrapToUpdate.setMetadataRecSet(metadataRecSet);
 						tempMetadataRecWrapToUpdate.setMetadataRecSetToRemove(metadataRecSetToRemove);
 						destinationMetadataWrapTOUpdate.add(tempMetadataRecWrapToUpdate);//this is for updating in enable tag under a class
 
@@ -424,10 +363,7 @@ public class ProfileMetadataMerger {
 				readReturn = readFile("src/test/resources/newFile_Dest.txt");
 				File fileToDelete = new File("src/test/resources/newFile_Dest.txt");
 				File fileToDeleteDest = new File("src/test/resources/newFile_jdk6.txt");
-				//boolean successDelSource = fileToDelete.delete();
-				//boolean successDelDest = fileToDeleteDest.delete();
-				
-				//System.out.println("Return" + successDelSource + successDelDest );
+
 			}
 
 		} catch (Exception e) {
