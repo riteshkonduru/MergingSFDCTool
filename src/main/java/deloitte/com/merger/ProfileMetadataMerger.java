@@ -23,6 +23,9 @@ import deloitte.com.wrap.UserPermissions;
 
 @RestController
 public class ProfileMetadataMerger {
+	
+	public static final String tagSeparator = new String("@@@");
+	public static final String seperator = new String("\\*SEPARATOR\\*");
 
 	/*
 	 * This method contains Merging/Adding elements to destination xml.
@@ -80,7 +83,6 @@ public class ProfileMetadataMerger {
 		String readReturn = "";
 		Profile profileSource = new Profile();
 		Profile profileDest= new Profile();
-		final String seperator = new String("\\*SEPARATOR\\*");
 		String[] compareContentStr;
 
 		try { 
@@ -115,127 +117,80 @@ public class ProfileMetadataMerger {
 		return readReturn;
 
 	}
+	public static HashMap<String, String> createMap(Profile objProfile) {
+		
+		HashMap<String, String> mapCompare = new HashMap<String, String>();
+		
+		//String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+		//String defaultConfigPath = rootPath + "profileTags.properties";
+		//Properties defaultProps = new Properties();
+		//defaultProps.load(new FileInputStream(defaultConfigPath));
+		//String classAccessesTags = defaultProps.getProperty("classAccessesTags");
+		
+		//Source map
+		if(objProfile.getClassAccesses() != null){
+			for(ClassAccesses tempClass: objProfile.getClassAccesses()) {
+				mapCompare.put("classAccesses"+tagSeparator+tempClass.apexClass, tempClass.apexClass+tagSeparator+tempClass.enabled);
+			}
+		}
+		if(objProfile.getPageAccesses() != null) {
+			for(PageAccesses tempPage: objProfile.getPageAccesses() ) {
+				mapCompare.put("pageAccesses"+tagSeparator+tempPage.apexPage, tempPage.apexPage+tagSeparator+tempPage.enabled);
+			}
+		}
+		if( objProfile.getUserPermissions() != null) {
+			for(UserPermissions tempUserP: objProfile.getUserPermissions()) {
+				mapCompare.put("userPermissions"+tagSeparator+tempUserP.name, tempUserP.name+tagSeparator+tempUserP.enabled);
+			}
+		}
+		if( objProfile.getTabVisibilities() != null) {
+			for(TabVisibilities temp: objProfile.getTabVisibilities()) {
+				mapCompare.put("tabVisibilities"+tagSeparator+temp.tab, temp.tab+tagSeparator+temp.visibility);
+			}
+		}
+		if( objProfile.getRecordTypeVisibilities() != null) {
+			for(RecordTypeVisibilities temp: objProfile.getRecordTypeVisibilities()) {
+				mapCompare.put("recordTypeVisibilities"+tagSeparator+temp.recordType, temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility);
+			}
+		}
+		if( objProfile.getObjectPermissions() != null) {
+			for(ObjectPermissions temp: objProfile.getObjectPermissions()) {
+				mapCompare.put("objectPermissions"+tagSeparator+temp.object, temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords);
+			}
+		}
+		if( objProfile.getLayoutAssignments() != null) {
+			for(LayoutAssignments temp: objProfile.getLayoutAssignments()) {
+				mapCompare.put("layoutAssignments"+tagSeparator+temp.layout, temp.layout+tagSeparator+temp.recordType);
+			}
+		}
+		if( objProfile.getFieldPermissions() != null) {
+			for(FieldPermissions temp: objProfile.getFieldPermissions()) {
+				mapCompare.put("fieldPermissions"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
+			}
+		}
+		if( objProfile.getFieldLevelSecurities() != null) {
+			for(FieldLevelSecurities temp: objProfile.getFieldLevelSecurities()) {
+				mapCompare.put("fieldLevelSecurities"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
+			}
+		}
+		if( objProfile.getCustomPermissions() != null) {
+			for(CustomPermissions temp: objProfile.getCustomPermissions()) {
+				mapCompare.put("customPermissions"+tagSeparator+temp.name, temp.name+tagSeparator+temp.enabled);
+			}
+		}
+
+		return mapCompare;
+	}
 
 
 
 	public static String compareTags(Profile profileSource, Profile profileDest, boolean isDelete) {
 		String xml ="";
-		final String tagSeparator = new String("@@@");
-		HashMap<String, String> destMap = new HashMap<String, String>();
-		HashMap<String, String> sourceMap = new HashMap<String, String>();
-
+		List<String> removeKeys = new ArrayList<String>();
+		HashMap<String, String> destMap = createMap(profileDest);
+		HashMap<String, String> sourceMap =createMap(profileSource);
 
 		try {
-			//String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-			//String defaultConfigPath = rootPath + "profileTags.properties";
-			//Properties defaultProps = new Properties();
-			//defaultProps.load(new FileInputStream(defaultConfigPath));
-			//String classAccessesTags = defaultProps.getProperty("classAccessesTags");
-
-			//Source map
-			if(profileSource.getClassAccesses() != null){
-				for(ClassAccesses tempClass: profileSource.getClassAccesses()) {
-					sourceMap.put("classAccesses"+tagSeparator+tempClass.apexClass, tempClass.apexClass+tagSeparator+tempClass.enabled);
-				}
-			}
-			if(profileSource.getPageAccesses() != null) {
-				for(PageAccesses tempPage: profileSource.getPageAccesses() ) {
-					sourceMap.put("pageAccesses"+tagSeparator+tempPage.apexPage, tempPage.apexPage+tagSeparator+tempPage.enabled);
-				}
-			}
-			if( profileSource.getUserPermissions() != null) {
-				for(UserPermissions tempUserP: profileSource.getUserPermissions()) {
-					sourceMap.put("userPermissions"+tagSeparator+tempUserP.name, tempUserP.name+tagSeparator+tempUserP.enabled);
-				}
-			}
-			if( profileSource.getTabVisibilities() != null) {
-				for(TabVisibilities temp: profileSource.getTabVisibilities()) {
-					sourceMap.put("tabVisibilities"+tagSeparator+temp.tab, temp.tab+tagSeparator+temp.visibility);
-				}
-			}
-			if( profileSource.getRecordTypeVisibilities() != null) {
-				for(RecordTypeVisibilities temp: profileSource.getRecordTypeVisibilities()) {
-					sourceMap.put("recordTypeVisibilities"+tagSeparator+temp.recordType, temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility);
-				}
-			}
-			if( profileSource.getObjectPermissions() != null) {
-				for(ObjectPermissions temp: profileSource.getObjectPermissions()) {
-					sourceMap.put("objectPermissions"+tagSeparator+temp.object, temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords);
-				}
-			}
-			if( profileSource.getLayoutAssignments() != null) {
-				for(LayoutAssignments temp: profileSource.getLayoutAssignments()) {
-					sourceMap.put("layoutAssignments"+tagSeparator+temp.layout, temp.layout+tagSeparator+temp.recordType);
-				}
-			}
-			if( profileSource.getFieldPermissions() != null) {
-				for(FieldPermissions temp: profileSource.getFieldPermissions()) {
-					sourceMap.put("fieldPermissions"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
-				}
-			}
-			if( profileSource.getFieldLevelSecurities() != null) {
-				for(FieldLevelSecurities temp: profileSource.getFieldLevelSecurities()) {
-					sourceMap.put("fieldLevelSecurities"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
-				}
-			}
-			if( profileSource.getCustomPermissions() != null) {
-				for(CustomPermissions temp: profileSource.getCustomPermissions()) {
-					sourceMap.put("customPermissions"+tagSeparator+temp.name, temp.name+tagSeparator+temp.enabled);
-				}
-			}
-
-			//Destination map
-			if(profileDest.getClassAccesses() != null) {
-				for(ClassAccesses tempClassDest: profileDest.getClassAccesses()) {
-					destMap.put("classAccesses"+tagSeparator+tempClassDest.apexClass, tempClassDest.apexClass+tagSeparator+tempClassDest.enabled);
-				}
-			}
-			if(profileDest.getPageAccesses() != null) {
-				for(PageAccesses tempPageDest: profileDest.getPageAccesses()) {
-					destMap.put("pageAccesses"+tagSeparator+tempPageDest.apexPage, tempPageDest.apexPage+tagSeparator+tempPageDest.enabled);
-				}
-			}
-			if(profileDest.getUserPermissions() != null) {
-				for(UserPermissions tempUserPDest: profileDest.getUserPermissions()) {
-					destMap.put("userPermissions"+tagSeparator+tempUserPDest.name, tempUserPDest.name+tagSeparator+tempUserPDest.enabled);
-				}
-			}
-			if( profileDest.getTabVisibilities() != null) {
-				for(TabVisibilities temp: profileDest.getTabVisibilities()) {
-					destMap.put("tabVisibilities"+tagSeparator+temp.tab, temp.tab+tagSeparator+temp.visibility);
-				}
-			}
-			if( profileDest.getRecordTypeVisibilities() != null) {
-				for(RecordTypeVisibilities temp: profileDest.getRecordTypeVisibilities()) {
-					destMap.put("recordTypeVisibilities"+tagSeparator+temp.recordType, temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility);
-				}
-			}
-			if( profileDest.getObjectPermissions() != null) {
-				for(ObjectPermissions temp: profileDest.getObjectPermissions()) {
-					destMap.put("objectPermissions"+tagSeparator+temp.object, temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords);
-				}
-			}
-			if( profileDest.getLayoutAssignments() != null) {
-				for(LayoutAssignments temp: profileDest.getLayoutAssignments()) {
-					destMap.put("layoutAssignments"+tagSeparator+temp.layout, temp.layout+tagSeparator+temp.recordType);
-				}
-			}
-			if( profileDest.getFieldPermissions() != null) {
-				for(FieldPermissions temp: profileDest.getFieldPermissions()) {
-					destMap.put("fieldPermissions"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
-				}
-			}
-			if( profileDest.getFieldLevelSecurities() != null) {
-				for(FieldLevelSecurities temp: profileDest.getFieldLevelSecurities()) {
-					destMap.put("fieldLevelSecurities"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
-				}
-			}
-			if( profileDest.getCustomPermissions() != null) {
-				for(CustomPermissions temp: profileDest.getCustomPermissions()) {
-					destMap.put("customPermissions"+tagSeparator+temp.name, temp.name+tagSeparator+temp.enabled);
-				}
-			}
-			List<String> removeKeys = new ArrayList<String>();
 
 			//This is to compare all the tags.
 			if(destMap.size() >0 && destMap != null && sourceMap.size() >0 && sourceMap != null ) {//To compare and update
