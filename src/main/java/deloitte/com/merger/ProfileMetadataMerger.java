@@ -1,13 +1,27 @@
 package deloitte.com.merger;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import deloitte.com.wrap.ClassAccesses;
 import deloitte.com.wrap.CustomPermissions;
@@ -67,6 +81,7 @@ public class ProfileMetadataMerger {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			return "Exception when deseralization";
 		}
 		System.out.println("Return");
 		return readReturn;
@@ -130,52 +145,62 @@ public class ProfileMetadataMerger {
 		//Source map
 		if(objProfile.getClassAccesses() != null){
 			for(ClassAccesses tempClass: objProfile.getClassAccesses()) {
-				mapCompare.put("classAccesses"+tagSeparator+tempClass.apexClass, tempClass.apexClass+tagSeparator+tempClass.enabled);
+				mapCompare.put("classAccesses"+tagSeparator+tempClass.apexClass+tagSeparator+tempClass.enabled, 
+															tempClass.apexClass+tagSeparator+tempClass.enabled);
 			}
 		}
 		if(objProfile.getPageAccesses() != null) {
 			for(PageAccesses tempPage: objProfile.getPageAccesses() ) {
-				mapCompare.put("pageAccesses"+tagSeparator+tempPage.apexPage, tempPage.apexPage+tagSeparator+tempPage.enabled);
+				mapCompare.put("pageAccesses"+tagSeparator+tempPage.apexPage+tagSeparator+tempPage.enabled, 
+															tempPage.apexPage+tagSeparator+tempPage.enabled);
 			}
 		}
 		if( objProfile.getUserPermissions() != null) {
 			for(UserPermissions tempUserP: objProfile.getUserPermissions()) {
-				mapCompare.put("userPermissions"+tagSeparator+tempUserP.name, tempUserP.name+tagSeparator+tempUserP.enabled);
+				mapCompare.put("userPermissions"+tagSeparator+tempUserP.name+tempUserP.enabled, 
+																tempUserP.name+tagSeparator+tempUserP.enabled);
 			}
 		}
 		if( objProfile.getTabVisibilities() != null) {
 			for(TabVisibilities temp: objProfile.getTabVisibilities()) {
-				mapCompare.put("tabVisibilities"+tagSeparator+temp.tab, temp.tab+tagSeparator+temp.visibility);
+				mapCompare.put("tabVisibilities"+tagSeparator+temp.tab+tagSeparator+temp.visibility, 
+																temp.tab+tagSeparator+temp.visibility);
 			}
 		}
 		if( objProfile.getRecordTypeVisibilities() != null) {
 			for(RecordTypeVisibilities temp: objProfile.getRecordTypeVisibilities()) {
-				mapCompare.put("recordTypeVisibilities"+tagSeparator+temp.recordType, temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility);
+				mapCompare.put("recordTypeVisibilities"+tagSeparator+temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility, 
+																	  temp.recordType+tagSeparator+temp.personAccountDefault+tagSeparator+temp.visible+tagSeparator+temp.defaultRecordTypeVisibility);
 			}
 		}
 		if( objProfile.getObjectPermissions() != null) {
 			for(ObjectPermissions temp: objProfile.getObjectPermissions()) {
-				mapCompare.put("objectPermissions"+tagSeparator+temp.object, temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords);
+				mapCompare.put("objectPermissions"+tagSeparator+temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords, 
+																 temp.object+tagSeparator+temp.allowCreate+tagSeparator+temp.allowDelete +tagSeparator+temp.allowEdit +tagSeparator+temp.allowRead +tagSeparator+temp.modifyAllRecords +tagSeparator+temp.viewAllRecords);
 			}
 		}
 		if( objProfile.getLayoutAssignments() != null) {
 			for(LayoutAssignments temp: objProfile.getLayoutAssignments()) {
-				mapCompare.put("layoutAssignments"+tagSeparator+temp.layout, temp.layout+tagSeparator+temp.recordType);
+				mapCompare.put("layoutAssignments"+tagSeparator+temp.layout+tagSeparator+temp.recordType, 
+																 temp.layout+tagSeparator+temp.recordType);
 			}
 		}
 		if( objProfile.getFieldPermissions() != null) {
 			for(FieldPermissions temp: objProfile.getFieldPermissions()) {
-				mapCompare.put("fieldPermissions"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
+				mapCompare.put("fieldPermissions"+tagSeparator+temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable, 
+																temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
 			}
 		}
 		if( objProfile.getFieldLevelSecurities() != null) {
 			for(FieldLevelSecurities temp: objProfile.getFieldLevelSecurities()) {
-				mapCompare.put("fieldLevelSecurities"+tagSeparator+temp.field, temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
+				mapCompare.put("fieldLevelSecurities"+tagSeparator+temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable, 
+																	temp.field+tagSeparator+temp.editable+tagSeparator+temp.hidden+tagSeparator+temp.readable);
 			}
 		}
 		if( objProfile.getCustomPermissions() != null) {
 			for(CustomPermissions temp: objProfile.getCustomPermissions()) {
-				mapCompare.put("customPermissions"+tagSeparator+temp.name, temp.name+tagSeparator+temp.enabled);
+				mapCompare.put("customPermissions"+tagSeparator+temp.name+tagSeparator+temp.enabled, 
+																 temp.name+tagSeparator+temp.enabled);
 			}
 		}
 
@@ -189,14 +214,17 @@ public class ProfileMetadataMerger {
 		List<String> removeKeys = new ArrayList<String>();
 		HashMap<String, String> destMap = createMap(profileDest);
 		HashMap<String, String> sourceMap =createMap(profileSource);
-
+		Profile profileDestFinal = new Profile();
+		
 		try {
 
 			//This is to compare all the tags.
 			if(destMap.size() >0 && destMap != null && sourceMap.size() >0 && sourceMap != null ) {//To compare and update
 
 				for(String removeDest :destMap.keySet()) {
+					System.out.println("removeDest " + removeDest + " " + !sourceMap.containsKey(removeDest) );
 					if(!sourceMap.containsKey(removeDest)) {
+						System.out.println("removeDest inside " + removeDest + " " + !sourceMap.containsKey(removeDest) );
 						removeKeys.add(removeDest);
 					}
 
@@ -206,6 +234,7 @@ public class ProfileMetadataMerger {
 						destMap.remove(keys);
 					}
 				}
+				System.out.println("destMap " + destMap.size());
 
 				if(isDelete) {//if the function call is not delete
 					for(String tempkey :sourceMap.keySet()) {
@@ -216,6 +245,7 @@ public class ProfileMetadataMerger {
 						}
 					}
 				}
+				System.out.println("destMap after update " + destMap.size() +" " + destMap);
 			}
 
 			List<ClassAccesses> lstTempCA = new ArrayList<>();
@@ -228,6 +258,17 @@ public class ProfileMetadataMerger {
 			List<FieldPermissions> lstTempFP = new ArrayList<>();
 			List<FieldLevelSecurities> lstTempFL = new ArrayList<>();
 			List<CustomPermissions> lstTempC = new ArrayList<>();
+			
+			profileDestFinal.classAccesses = lstTempCA;
+			profileDestFinal.pageAccesses = lstTempPA;
+			profileDestFinal.userPermissions = lstTempUP;
+			profileDestFinal.tabVisibilities = lstTempTV;
+			profileDestFinal.recordTypeVisibilities = lstTempRTV;
+			profileDestFinal.objectPermissions = lstTempOP;
+			profileDestFinal.layoutAssignments = lstTempLA;
+			profileDestFinal.fieldPermissions = lstTempFP;
+			profileDestFinal.fieldLevelSecurities = lstTempFL;
+			profileDestFinal.customPermissions = lstTempC;
 
 
 			//Create and add
@@ -241,10 +282,12 @@ public class ProfileMetadataMerger {
 					tempclass.apexClass =arrOfStrclassAccessesTag[0];
 					tempclass.enabled =arrOfStrclassAccessesTag[1];
 					if(isDelete) {
-						profileDest.classAccesses.add(tempclass);
+						System.out.println("In classaccess " + tempclass);
+						profileDestFinal.classAccesses.add(tempclass);
 					}else {
+						System.out.println("In classaccess else " + tempclass);
 						lstTempCA.add(tempclass);
-						profileDest.setClassAccesses(lstTempCA);
+						profileDestFinal.setClassAccesses(lstTempCA);
 
 					}
 				}
@@ -255,10 +298,10 @@ public class ProfileMetadataMerger {
 					tempPage.apexPage =arrOfStrclassAccessesTag[0];
 					tempPage.enabled =arrOfStrclassAccessesTag[1];
 					if(isDelete) {
-						profileDest.pageAccesses.add(tempPage);
+						profileDestFinal.pageAccesses.add(tempPage);
 					}else {
 						lstTempPA.add(tempPage);
-						profileDest.setPageAccesses(lstTempPA);
+						profileDestFinal.setPageAccesses(lstTempPA);
 					}
 				}
 				if(arrOfStr[0].equals("userPermissions")) {
@@ -268,10 +311,10 @@ public class ProfileMetadataMerger {
 					tempUser.name =arrOfStrclassAccessesTag[0];
 					tempUser.enabled =arrOfStrclassAccessesTag[1];
 					if(isDelete) {
-						profileDest.userPermissions.add(tempUser);
+						profileDestFinal.userPermissions.add(tempUser);
 					}else {
 						lstTempUP.add(tempUser);
-						profileDest.setUserPermissions(lstTempUP);
+						profileDestFinal.setUserPermissions(lstTempUP);
 					}
 				}
 				if(arrOfStr[0].equals("tabVisibilities")) {
@@ -281,10 +324,10 @@ public class ProfileMetadataMerger {
 					temp.tab =arrOfStrclassAccessesTag[0];
 					temp.visibility =arrOfStrclassAccessesTag[1];
 					if(isDelete) {
-						profileDest.tabVisibilities.add(temp);
+						profileDestFinal.tabVisibilities.add(temp);
 					}else {
 						lstTempTV.add(temp);
-						profileDest.setTabVisibilities(lstTempTV);
+						profileDestFinal.setTabVisibilities(lstTempTV);
 					}
 				}
 				if(arrOfStr[0].equals("recordTypeVisibilities")) {
@@ -296,10 +339,10 @@ public class ProfileMetadataMerger {
 					temp.visible =arrOfStrclassAccessesTag[1].equals("true")?true:false;
 					temp.defaultRecordTypeVisibility =arrOfStrclassAccessesTag[1].equals("true")?true:false;
 					if(isDelete) {
-						profileDest.recordTypeVisibilities.add(temp);
+						profileDestFinal.recordTypeVisibilities.add(temp);
 					}else {
 						lstTempRTV.add(temp);
-						profileDest.setRecordTypeVisibilities(lstTempRTV);
+						profileDestFinal.setRecordTypeVisibilities(lstTempRTV);
 					}
 
 				}
@@ -315,10 +358,10 @@ public class ProfileMetadataMerger {
 					temp.modifyAllRecords =arrOfStrclassAccessesTag[5].equals("true")?true:false;
 					temp.viewAllRecords =arrOfStrclassAccessesTag[6].equals("true")?true:false;
 					if(isDelete) {
-						profileDest.objectPermissions.add(temp);
+						profileDestFinal.objectPermissions.add(temp);
 					}else {
 						lstTempOP.add(temp);
-						profileDest.setObjectPermissions(lstTempOP);
+						profileDestFinal.setObjectPermissions(lstTempOP);
 					}
 					System.out.println("profileDest " + profileDest.getObjectPermissions());
 				}
@@ -329,10 +372,10 @@ public class ProfileMetadataMerger {
 					temp.layout =arrOfStrclassAccessesTag[0];
 					temp.recordType =arrOfStrclassAccessesTag[1];
 					if(isDelete) {
-						profileDest.layoutAssignments.add(temp);
+						profileDestFinal.layoutAssignments.add(temp);
 					}else {
 						lstTempLA.add(temp);
-						profileDest.setLayoutAssignments(lstTempLA);
+						profileDestFinal.setLayoutAssignments(lstTempLA);
 					}
 				}
 				if(arrOfStr[0].equals("fieldPermissions")) {
@@ -344,10 +387,10 @@ public class ProfileMetadataMerger {
 					temp.hidden =arrOfStrclassAccessesTag[2].equals("true")?true:false;
 					temp.readable =arrOfStrclassAccessesTag[3].equals("true")?true:false;
 					if(isDelete) {
-						profileDest.fieldPermissions.add(temp);
+						profileDestFinal.fieldPermissions.add(temp);
 					}else {
 						lstTempFP.add(temp);
-						profileDest.setFieldPermissions(lstTempFP);
+						profileDestFinal.setFieldPermissions(lstTempFP);
 					}
 				}
 				if(arrOfStr[0].equals("fieldLevelSecurities")) {
@@ -359,10 +402,10 @@ public class ProfileMetadataMerger {
 					temp.hidden =arrOfStrclassAccessesTag[2].equals("true")?true:false;
 					temp.readable =arrOfStrclassAccessesTag[3].equals("true")?true:false;
 					if(isDelete) {
-						profileDest.fieldLevelSecurities.add(temp);
+						profileDestFinal.fieldLevelSecurities.add(temp);
 					}else {
 						lstTempFL.add(temp);
-						profileDest.setFieldLevelSecurities(lstTempFL);
+						profileDestFinal.setFieldLevelSecurities(lstTempFL);
 					}
 				}
 				if(arrOfStr[0].equals("customPermissions")) {
@@ -372,23 +415,49 @@ public class ProfileMetadataMerger {
 					temp.name =arrOfStrclassAccessesTag[0];
 					temp.enabled = arrOfStrclassAccessesTag[1].equals("true")?true:false;
 					if(isDelete) {
-						profileDest.customPermissions.add(temp);
+						profileDestFinal.customPermissions.add(temp);
 					}else {
 						lstTempC.add(temp);
-						profileDest.setCustomPermissions(lstTempC);
+						profileDestFinal.setCustomPermissions(lstTempC);
 					}
 				}
 
 			}
 
 			XmlMapper xmlMapper = new XmlMapper();
-			xml = xmlMapper.writeValueAsString(profileDest);
+			xml = convertStringToDocument(xmlMapper.writeValueAsString(profileDestFinal));
 			System.out.println("xml  " + xml);
+			
 		}catch(Exception ex) {
 			ex.printStackTrace(); 
 			System.out.println(ex); 
 		}
 		return xml;
+	}
+	public static String convertStringToDocument(String xmlStr) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();  
+        DocumentBuilder builder;  
+        try  
+        {  
+            builder = factory.newDocumentBuilder();  
+            Document doc = builder.parse( new InputSource( new StringReader( xmlStr ) ) ); 
+            return prettyPrint(doc);
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        } 
+        return null;
+    }
+	
+	public static final String prettyPrint(Document xml) throws Exception {
+
+		Transformer tf = TransformerFactory.newInstance().newTransformer();
+		tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+		tf.setOutputProperty(OutputKeys.INDENT, "yes");
+		Writer out = new StringWriter();
+		tf.transform(new DOMSource(xml), new StreamResult(out));
+		//System.out.println(out.toString());
+		return out.toString();
+
 	}
 }
 
